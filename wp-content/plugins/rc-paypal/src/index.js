@@ -10,10 +10,7 @@ const donateButton = document.getElementById('donate-btn')
 donateButton.addEventListener('click', function (){
 
     setTimeout(()=>{
-
         const payPalGo = new PayPalGo();
-
-
     },500)
 
 })

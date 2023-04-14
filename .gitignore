@@ -1,3 +1,4 @@
 # Project exclude paths
 /wp-content/plugins/rc-paypal/build/
 /wp-content/plugins/rc-paypal/node_modules/
+/.idea/.gitignore

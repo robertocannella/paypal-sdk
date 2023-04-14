@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SshConfigs">
+    <configs>
+      <sshConfig authType="PASSWORD" host="blackstonest.sftp.wpengine.com" id="c88ce667-368e-46f3-aac5-61a7ae3411b5" port="2222" nameFormat="DESCRIPTIVE" username="blackstonest-bkj-sftp" useOpenSSHConfig="true" />
+    </configs>
+  </component>
+</project>

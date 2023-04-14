@@ -4,40 +4,36 @@ import { loadScript } from "@paypal/paypal-js";
 
 export default class PayPalGo {
     buttons;
-
+    COMPONENTS = "buttons"
     constructor(oneTimeTab, monthlyTab) {
         this.CLIENT_ID = "ARFnDMd4C3p4E6GZIhBHpLuYoSF-ojNrUebyIj-ZDFAvoYw9B3joniuDOloqCwirlZT2anruvgbTQePt";
         this.oneTimeTab = document.getElementById('elementor-tab-title-2071')
         this.monthlyTab = document.getElementById('elementor-tab-title-2072')
         this.monthlyTabContainerElement = document.getElementById('paypal-button-container-monthly');
         this.oneTimeTabContainerElement = document.getElementById('paypal-button-container');
-        this.COMPONENTS = "buttons";
 
 
 
-
-        this.events = this.events.bind(this);
         this.loadPayPalScript = this.loadPayPalScript.bind(this);
-        this.cleanupBeforeReload = this.cleanupBeforeReload.bind(this);
 
         this.events();
 
     }
-    events(){
+    events = () => {
+        this.loadAndRender('order')
         this.oneTimeTab.addEventListener('click', () => this.setUpOneTime() );
         this.monthlyTab.addEventListener('click', () => this.setUpMonthly() );
     }
     setUpOneTime = () => {
         this.cleanupBeforeReload();
         console.log("Clicked One Time Tab")
-        this.debounce(this.loadPayPalScript("capture", this.oneTimeTabContainerElement, false), 500);
+        this.debounce(this.loadAndRender("order"));
 
     }
     setUpMonthly = () => {
         this.cleanupBeforeReload();
         console.log("Clicked Monthly Tab")
-        this.debounce(this.loadPayPalScript("subscription", this.monthlyTabContainerElement), 500);
-
+        this.debounce(this.loadAndRender("subscription"));
 
     }
     async loadPayPalScript(intent, containerElement, vault = true){
@@ -58,7 +54,7 @@ export default class PayPalGo {
             }
         }
     }
-    cleanupBeforeReload() {
+    cleanupBeforeReload = () => {
         if (this.buttons) {
             console.log(this.buttons, "CLEANUP")
             this.buttons.close();
@@ -77,6 +73,53 @@ export default class PayPalGo {
             timeout = setTimeout(later, wait);
         };
     };
+
+    loadAndRender = (transactionType) => {
+        console.log("transaction type:", transactionType);
+        if (transactionType === "order") {
+            window
+                .paypalLoadScript({
+                    "client-id": this.CLIENT_ID,
+                    vault: false,
+                    components: this.COMPONENTS
+                })
+                .then(() => {
+                    this.render({});
+                });
+        } else {
+            window
+                .paypalLoadScript({
+                    "client-id": this.CLIENT_ID,
+                    vault: true,
+                    intent: "subscription",
+                    components: this.COMPONENTS
+                })
+                .then(() => {
+                    this.render({
+                        style: {
+                            shape: "pill",
+                            color: "gold",
+                            layout: "vertical",
+                            label: "subscribe"
+                        },
+                        createSubscription: function (data, actions) {
+                            return actions.subscription.create({
+                                plan_id: "P-3RX065706M3469222L5IFM4I"
+                            });
+                        }
+                    });
+                });
+        }
+    }
+    render = (options) => {
+        this.buttons = paypal.Buttons(options);
+        this.buttons.render("#paypal-button-container").catch((err) => {
+            console.warn(
+                "Warning - Caught an error when attempting to render component",
+                err
+            );
+        });
+    }
 
 
 
