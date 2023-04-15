@@ -8,37 +8,50 @@ export default class PayPalGo {
     COMPONENTS = "buttons"
     paypal;
     constructor() {
-
+        //console.log("Loaded paypal")
         this.CLIENT_ID = "ARFnDMd4C3p4E6GZIhBHpLuYoSF-ojNrUebyIj-ZDFAvoYw9B3joniuDOloqCwirlZT2anruvgbTQePt";
+        // SANDBOX
+        //this.CLIENT_ID = "AfNcYDz5y6sU2UJBcjyOVOEPtmrhridVapBSCukWG9L2zSmtQ4q68iIJ1WMSb8e9qJ0kRXRJaoCDlV_l";
         this.oneTimeTab = document.getElementById('elementor-tab-title-2071')
         this.monthlyTab = document.getElementById('elementor-tab-title-2072')
+        this.oneTimeTabs = document.querySelectorAll('div[aria-controls="elementor-tab-content-2071"]')
+        this.monthlyTabs = document.querySelectorAll('div[aria-controls="elementor-tab-content-2072"]')
+
         this.monthlyTabContainerElement = document.getElementById('paypal-button-container-monthly');
         this.oneTimeTabContainerElement = document.getElementById('paypal-button-container');
 
         this.events();
-        this.loadAndRender('order')
+        this.setUpOneTime();
 
     }
     events = () => {
-        this.loadAndRender('none')
-        this.oneTimeTab.addEventListener('click', () => this.setUpOneTime() );
-        this.monthlyTab.addEventListener('click', () => this.setUpMonthly() );
+
+        this.oneTimeTabs.forEach(tab => {
+            tab.addEventListener('click', ()=> this.setUpOneTime());
+        })
+        this.monthlyTabs.forEach(tab => {
+            tab.addEventListener('click', ()=> this.setUpMonthly());
+        })
+
+
     }
     setUpOneTime = () => {
-        this.cleanupBeforeReload();
-        console.log("Clicked One Time Tab")
-        this.debounce(this.loadAndRender("order"));
+
+        oneTime.cleanupBeforeReload();
+        //console.log("Clicked One Time Tab")
+        this.debounce(this.loadAndRender("order"),500);
 
     }
     setUpMonthly = () => {
-        this.cleanupBeforeReload();
-        console.log("Clicked Monthly Tab")
-        this.debounce(this.loadAndRender("subscription"));
+        monthly.cleanupBeforeReload();
+        //console.log("Clicked Monthly Tab")
+        this.debounce(this.loadAndRender("subscription"),500);
 
     }
     cleanupBeforeReload = () => {
+        //console.log("running cleanup", this.buttons)
         if (this.buttons) {
-            console.log(this.buttons, "CLEANUP")
+            //console.log(this.buttons, "Removed Buttons")
             this.buttons.close();
         }
     }
@@ -57,7 +70,7 @@ export default class PayPalGo {
     };
 
     loadAndRender = (transactionType) => {
-        console.log("transaction type:", transactionType);
+        //console.log("transaction type:", transactionType);
 
         if (transactionType === "order") {
             window

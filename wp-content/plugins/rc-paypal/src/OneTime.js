@@ -1,19 +1,68 @@
 import { loadScript } from "@paypal/paypal-js";
 
 class OneTime{
+    buttons;
     fundingSources;
-    constructor() {
-        console.log("One Time JS loaded")
-
-    }
     render = (options) => {
 
-        console.log("render one time button")
+        // Get the elements from the DOM
+
+        const donationButtons = document.querySelectorAll('.bpc-donate__row');
+        const selectBox = document.querySelector('#item-options');
+        const planHeader = document.querySelector('#plan-header');
+        const continueToPayPal = document.querySelector('.bpc-donate__message-continue');
+
+        // Add the events
+        donationButtons.forEach(function (btn,index) {
+            btn.addEventListener('click',function (){
+
+
+                // PayPal Popup
+                document.querySelector('.bpc-donate__paypal-container').style.opacity = 1;
+                document.querySelector('.bpc-donate__paypal-container').style.visibility = "visible";
+
+
+                donationButtons.forEach(btn=>{
+                    btn.classList.remove('selected')
+                })
+                btn.classList.add('selected')
+
+                selectBox.value = btn.dataset.id;
+                selectBox.options[index + 1].selected = true;
+
+                //   let value = btn.dataset.id.charAt(0).toUpperCase() + btn.dataset.id.slice(1);
+                let value = capitalizeFirstLetters(btn.dataset.id)
+                continueToPayPal.innerHTML = `Continue to PayPal and sign up for the ${value} plan:`;
+                triggerEvent(selectBox);
+            });
+        });
+
+
+        const bpcClose = document.querySelector('.bpc-donate__message-close')
+        bpcClose.addEventListener('click',()=>{
+            document.querySelector('.bpc-donate__paypal-container').style.opacity = 0;
+            document.querySelector('.bpc-donate__paypal-container').style.visibility = "hidden";
+
+        });
+
+
+        this.cleanupBeforeReload();
+        //console.log("render one time button")
         this.fundingSources = [
             paypal.FUNDING.PAYPAL,
             paypal.FUNDING.CARD
         ];
-
+        let shipping = 0;
+        let itemOptions = document.querySelector("#smart-button-container #item-options");
+        let quantity = parseInt();
+        let quantitySelect = document.querySelector("#smart-button-container #quantitySelect");
+        if (!isNaN(quantity)) {
+            quantitySelect.style.visibility = "visible";
+        }
+        var orderDescription = 'Donations';
+        if(orderDescription === '') {
+            orderDescription = 'Item';
+        }
 
         this.buttons = paypal.Buttons(
 
@@ -21,27 +70,26 @@ class OneTime{
             // Here are the options for the one time payment buttons
             {
 
-                // onInit is called when the button first renders
-                onInit: function(data, actions) {
-
-                    // Disable the buttons
-                    actions.disable();
-
-                    // Listen for changes to the checkbox
-                    document.querySelector('#item-options')
-                        .addEventListener('change', function(event) {
-
-                            console.log(event.target.value)
-                            // Enable or disable the button when it is checked or unchecked
-                            if (event.target.value !== "") {
-                                actions.enable();
-                            } else {
-                                actions.disable();
-                            }
-
-                        });
-                    console.log("onInit", data)
-                },
+                // // onInit is called when the button first renders
+                // onInit: function(data, actions) {
+                //
+                //     // Disable the buttons
+                //     actions.disable();
+                //
+                //     // Listen for changes to the checkbox
+                //     document.querySelector('#item-options')
+                //         .addEventListener('change', function(event) {
+                //
+                //             console.log(event.target.value)
+                //             // Enable or disable the button when it is checked or unchecked
+                //             if (event.target.value !== "") {
+                //                 actions.enable();
+                //             } else {
+                //                 actions.disable();
+                //             }
+                //
+                //         });
+                // },
 
 
                 fundingSource: this.fundingSources[1],
@@ -60,11 +108,14 @@ class OneTime{
                     }
                 },
                 createOrder: function(data, actions) {
+
+
+
+
                     var selectedItemDescription = itemOptions.options[itemOptions.selectedIndex].value;
 
                     if(selectedItemDescription === ""){
                         console.log("Select an option");
-
                     }
 
                     var selectedItemPrice = parseFloat(itemOptions.options[itemOptions.selectedIndex].getAttribute("price"));
@@ -132,7 +183,7 @@ class OneTime{
                     return actions.order.capture().then(function(orderData) {
 
                         // Full available details
-                        console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
+                        //console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
 
                         // Show a success message within this page, e.g.
                         const element = document.getElementById('paypal-button-container');
@@ -145,10 +196,11 @@ class OneTime{
                     });
                 },
                 onError: function(err) {
-                    console.error(err)
+                    console.error("Error Creating order", err)
                 },
             }
         );
+
         this.buttons.render("#paypal-button-container")
             .catch((err) => {
             console.warn(
@@ -156,9 +208,15 @@ class OneTime{
                 err
             );
         });
+
     }
 
-
+    cleanupBeforeReload() {
+        //console.log("Cleaning up one time buttons: " , this.buttons)
+        if (this.buttons) {
+            this.buttons.close();
+        }
+    }
 
 }
 
