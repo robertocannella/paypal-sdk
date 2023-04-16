@@ -7,6 +7,9 @@
           <mappings>
             <mapping deploy="/wp-content" local="$PROJECT_DIR$/wp-content" web="/" />
           </mappings>
+          <excludedPaths>
+            <excludedPath path="/wp-content/plugins/rc-paypal/node_modules" />
+          </excludedPaths>
         </serverdata>
       </paths>
     </serverData>

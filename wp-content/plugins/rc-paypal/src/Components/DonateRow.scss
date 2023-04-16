@@ -1,0 +1,48 @@
+.bpc-donate__row {
+  margin-bottom: 1rem;
+
+}
+
+.bpc-donate__row-label {
+  display: inline-block;
+  width: 75px;
+  font-weight: bold;
+}
+
+.bpc-donate__row-btn-sm {
+  display: inline-block;
+  padding: 0.5rem;
+  background-color: #007bff;
+  color: #fff;
+  border-radius: 0.25rem;
+  margin-left: 1rem;
+  cursor: pointer;
+  transition: width 0.3s ease-in-out;
+  width: 45px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+
+  &:hover {
+    width: calc((var(--amount) / 1000) * 70px + 50px); // calculate the width based on the amount
+    // for example, if amount is 500, the width will be calc((500 / 1000) * 70px + 30px) = 65px
+
+  }
+}
+
+.bpc-donate__25 {
+  background-color: #28a745;
+
+}
+
+.bpc-donate__100 {
+  background-color: #ffc107;
+}
+
+.bpc-donate__500 {
+  background-color: #dc3545;
+}
+.donation-container {
+
+}
