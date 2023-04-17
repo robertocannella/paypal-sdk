@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" autoUpload="Always" serverName="blackstonest.sftp.wpengine.com" remoteFilesAllowedToDisappearOnAutoupload="false" autoUploadExternalChanges="true">
+    <serverData>
+      <paths name="blackstonest.sftp.wpengine.com">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/wp-content" local="$PROJECT_DIR$/wp-content" web="/" />
+          </mappings>
+          <excludedPaths>
+            <excludedPath path="/wp-content/plugins/rc-paypal/node_modules" />
+          </excludedPaths>
+        </serverdata>
+      </paths>
+    </serverData>
+    <option name="myAutoUpload" value="ALWAYS" />
+  </component>
+</project>

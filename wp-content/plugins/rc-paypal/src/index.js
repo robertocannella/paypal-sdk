@@ -1,22 +1,24 @@
 import PayPalGo  from "./PayPalGo";
 
 
+setTimeout( setUpFunction, 300);
 
-// These are the tabs that receive the events
+function setUpFunction() {
+    const donateButton = document.getElementById('donate-btn')
+    const mobileDonateButton = document.getElementById('donate-btn-mbl');
 
-const donateButton = document.getElementById('donate-btn')
+    donateButton.addEventListener('click', function (){
+        setTimeout(()=>{
+            const payPalGo = new PayPalGo();
+        },500)
+    })
+    mobileDonateButton.addEventListener('click', function (){
+        setTimeout(()=>{
+            const payPalGo = new PayPalGo();
+        },500)
+    })
+}
 
-
-donateButton.addEventListener('click', function (){
-
-    setTimeout(()=>{
-
-        const payPalGo = new PayPalGo();
-
-
-    },500)
-
-})
 
 
 

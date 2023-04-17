@@ -1,66 +1,57 @@
 import { loadScript } from "@paypal/paypal-js";
 
-
+import oneTime from "./OneTime";
+import monthly from "./Monthly";
 
 export default class PayPalGo {
     buttons;
-
-    constructor(oneTimeTab, monthlyTab) {
+    COMPONENTS = "buttons"
+    paypal;
+    constructor() {
+        //console.log("Loaded paypal")
         this.CLIENT_ID = "ARFnDMd4C3p4E6GZIhBHpLuYoSF-ojNrUebyIj-ZDFAvoYw9B3joniuDOloqCwirlZT2anruvgbTQePt";
+        // SANDBOX
+        //this.CLIENT_ID = "AfNcYDz5y6sU2UJBcjyOVOEPtmrhridVapBSCukWG9L2zSmtQ4q68iIJ1WMSb8e9qJ0kRXRJaoCDlV_l";
         this.oneTimeTab = document.getElementById('elementor-tab-title-2071')
         this.monthlyTab = document.getElementById('elementor-tab-title-2072')
+        this.oneTimeTabs = document.querySelectorAll('div[aria-controls="elementor-tab-content-2071"]')
+        this.monthlyTabs = document.querySelectorAll('div[aria-controls="elementor-tab-content-2072"]')
+
         this.monthlyTabContainerElement = document.getElementById('paypal-button-container-monthly');
         this.oneTimeTabContainerElement = document.getElementById('paypal-button-container');
-        this.COMPONENTS = "buttons";
-
-
-
-
-        this.events = this.events.bind(this);
-        this.loadPayPalScript = this.loadPayPalScript.bind(this);
-        this.cleanupBeforeReload = this.cleanupBeforeReload.bind(this);
 
         this.events();
+        this.setUpOneTime();
 
     }
-    events(){
-        this.oneTimeTab.addEventListener('click', () => this.setUpOneTime() );
-        this.monthlyTab.addEventListener('click', () => this.setUpMonthly() );
+    events = () => {
+
+        this.oneTimeTabs.forEach(tab => {
+            tab.addEventListener('click', ()=> this.setUpOneTime());
+        })
+        this.monthlyTabs.forEach(tab => {
+            tab.addEventListener('click', ()=> this.setUpMonthly());
+        })
+
+
     }
     setUpOneTime = () => {
-        this.cleanupBeforeReload();
-        console.log("Clicked One Time Tab")
-        this.debounce(this.loadPayPalScript("capture", this.oneTimeTabContainerElement, false), 500);
+
+        oneTime.cleanupBeforeReload();
+        //console.log("Clicked One Time Tab")
+        this.debounce(this.loadAndRender("order"),500);
 
     }
     setUpMonthly = () => {
-        this.cleanupBeforeReload();
-        console.log("Clicked Monthly Tab")
-        this.debounce(this.loadPayPalScript("subscription", this.monthlyTabContainerElement), 500);
-
+        monthly.cleanupBeforeReload();
+        //console.log("Clicked Monthly Tab")
+        this.debounce(this.loadAndRender("subscription"),500);
 
     }
-    async loadPayPalScript(intent, containerElement, vault = true){
-        let paypal;
-        console.log(containerElement.id)
-        try {
-            console.log(containerElement.id, intent, vault)
-            paypal = await loadScript({ "client-id": this.CLIENT_ID, "intent":intent, "vault": vault});
-        } catch (error) {
-            console.error("failed to load the PayPal JS SDK script", error);
-        }
-
-        if (paypal) {
-            try {
-                await paypal.Buttons().render(`#${containerElement.id}`);
-            } catch (error) {
-                console.error("failed to render the PayPal Buttons", error);
-            }
-        }
-    }
-    cleanupBeforeReload() {
+    cleanupBeforeReload = () => {
+        //console.log("running cleanup", this.buttons)
         if (this.buttons) {
-            console.log(this.buttons, "CLEANUP")
+            //console.log(this.buttons, "Removed Buttons")
             this.buttons.close();
         }
     }
@@ -77,6 +68,44 @@ export default class PayPalGo {
             timeout = setTimeout(later, wait);
         };
     };
+
+    loadAndRender = (transactionType) => {
+        //console.log("transaction type:", transactionType);
+
+        if (transactionType === "order") {
+            window
+                .paypalLoadScript({
+                    "client-id": this.CLIENT_ID,
+                    vault: false,
+                    components: this.COMPONENTS
+                })
+                .then(() => {
+                    oneTime.render();
+                });
+        } else if (transactionType === "subscription") {
+            window
+                .paypalLoadScript({
+                    "client-id": this.CLIENT_ID,
+                    vault: true,
+                    intent: "subscription",
+                    components: this.COMPONENTS
+                })
+                .then(() => {
+                    monthly.render();
+                });
+        } else {
+            console.log("no order")
+        }
+    }
+    render = (options, elementID) => {
+        this.buttons = this.paypal.Buttons(options);
+        this.buttons.render(elementID).catch((err) => {
+            console.warn(
+                "Warning - Caught an error when attempting to render component",
+                err
+            );
+        });
+    }
 
 
 
